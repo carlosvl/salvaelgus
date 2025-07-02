@@ -1,0 +1,24 @@
+minimum_cumulusci_version: '3.79.0'
+project:
+    name: salvaelgus
+    package:
+        name: salvaelgus
+        api_version: '58.0'
+    git:
+    source_format: sfdx
+
+tasks:
+    robot:
+        options:
+            suites: robot/salvaelgus/tests
+            options:
+                outputdir: robot/salvaelgus/results
+
+    robot_testdoc:
+        options:
+            path: robot/salvaelgus/tests
+            output: robot/salvaelgus/doc/salvaelgus_tests.html
+
+    run_tests:
+        options:
+            required_org_code_coverage_percent: 75

@@ -1,0 +1,100 @@
+<template>
+    <div class="ai-glass-card">
+        <div class="ai-header">
+            <div class="ai-avatar">
+                <svg viewBox="0 0 64 64" class="ai-hero-icon">
+                  <circle cx="32" cy="32" r="30" fill="#ffe4ea"/>
+                  <g>
+                      <rect x="24" y="20" width="16" height="24" rx="6" fill="#e43c54"/>
+                      <ellipse cx="32" cy="32" rx="6" ry="6" fill="#fff"/>
+                  </g>
+                </svg>
+            </div>
+            <div>
+                <div class="ai-title">File Analyzer <span class="ai-blink">✨</span></div>
+                <div class="ai-caption">Let AI review your Bills instantly</div>
+            </div>
+        </div>
+
+        <!-- File Upload -->
+        <div class="ai-upload-wrapper">
+            <lightning-file-upload
+                label="Upload Image or PDF"
+                name="uploadFile"
+                multiple="false"
+                accept=".jpg,.jpeg,.png,.pdf"
+                record-id={uploadRecordId}
+                onuploadfinished={fileUploadHandler}
+                class="ai-file-upload"
+            ></lightning-file-upload>
+            <template if:true={uploadedFileName}>
+                <div class="ai-uploaded-file">
+                    <lightning-icon icon-name="doctype:image" size="x-small"></lightning-icon>
+                    <span class="ai-uploaded-file-name">{uploadedFileName}</span>
+                </div>
+            </template>
+        </div>
+
+        <!-- Analyze Button -->
+        <lightning-button
+            variant="brand"
+            label="Analyze Files"
+            icon-name="utility:einstein"
+            class="ai-analyze-btn slds-m-top_medium"
+            disabled={disableAnalyzeButton}
+            onclick={handleAnalyzeFiles}
+        ></lightning-button>
+
+        <!-- Loading Spinner -->
+        <template if:true={isLoading}>
+            <div class="ai-loading">
+                <div class="ai-loader"></div>
+                <span class="ai-analyzing">Analyzing with AI…</span>
+            </div>
+        </template>
+
+        <!-- Error Message -->
+        <template if:true={errorMessage}>
+            <div class="ai-error">
+                <lightning-icon icon-name="utility:error" size="x-small"></lightning-icon>
+                <span>{errorMessage}</span>
+            </div>
+        </template>
+
+        <!-- AI Analysis Result + Actions -->
+        <template if:true={aiResult}>
+            <div class="ai-result">
+                <lightning-icon icon-name="utility:bot" size="small"></lightning-icon>
+                <lightning-formatted-rich-text value={aiResult}></lightning-formatted-rich-text>
+            </div>
+            <div class="ai-actions-group">
+                <lightning-button-group>
+                    <lightning-button
+                        variant="neutral"
+                        label="Add to Case"
+                        icon-name="utility:add"
+                        onclick={handleAddToCase}
+                    ></lightning-button>
+                    <lightning-button
+                        variant="neutral"
+                        label="Copy"
+                        icon-name="utility:copy"
+                        onclick={handleCopyToClipboard}
+                    ></lightning-button>
+                    <!-- Optional: Add Download as PDF if you plan to implement it -->
+                    <!--
+                    <lightning-button
+                        variant="neutral"
+                        label="Download PDF"
+                        icon-name="utility:download"
+                        onclick={handleDownloadPdf}
+                    ></lightning-button>
+                    -->
+                </lightning-button-group>
+                <template if:true={showActionToast}>
+                    <div class="ai-action-toast">{actionToastMessage}</div>
+                </template>
+            </div>
+        </template>
+    </div>
+</template>  
