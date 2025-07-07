@@ -27,9 +27,9 @@
     animation: float 3.5s ease-in-out infinite;
 }
 @keyframes float {
-    0% { transform: translateY(0); }
-    50% { transform: translateY(-7px);}
-    100% { transform: translateY(0); }
+    0% { transform: translateY(0px); }
+    50% { transform: translateY(-7px); }
+    100% { transform: translateY(0px); }
 }
 
 .ai-title {
@@ -149,20 +149,27 @@
     padding: 1rem;
     margin-top: 1.1rem;
     box-shadow: 0 1px 8px rgba(46, 125, 50, 0.06);
+    overflow: hidden; 
 }
 
 .ai-result-table {
     width: 100%;
     background-color: transparent;
     border: none;
+    table-layout: fixed;
 }
 .ai-result-key {
     font-weight: 600;
     color: #2E7D32; /* Dark green for table keys */
-    width: 40%;
+    width: 65%;
+    overflow-wrap: break-word; /* NEW: Add wrapping rules to the key column */
+    word-break: break-all;
+    vertical-align: top; /* NEW: Align to top for cleaner multiline display */
 }
 .ai-result-value {
+    overflow-wrap: break-word; 
     word-break: break-all;
+    vertical-align: top; /* NEW: Align to top for cleaner multiline display */
 }
 .ai-result-raw {
     display: flex;
