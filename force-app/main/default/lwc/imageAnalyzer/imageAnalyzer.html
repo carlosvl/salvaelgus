@@ -16,34 +16,60 @@
             </div>
         </div>
 
-        <!-- File Upload -->
-        <div class="ai-upload-wrapper">
-            <lightning-file-upload
-                label="Upload Image or PDF"
-                name="uploadFile"
-                multiple="false"
-                accept=".jpg,.jpeg,.png,.pdf"
-                record-id={uploadRecordId}
-                onuploadfinished={fileUploadHandler}
-                class="ai-file-upload"
-            ></lightning-file-upload>
-            <template if:true={uploadedFileName}>
-                <div class="ai-uploaded-file">
-                    <lightning-icon icon-name="doctype:image" size="x-small"></lightning-icon>
-                    <span class="ai-uploaded-file-name">{uploadedFileName}</span>
+        <!-- NEW: Tabbed interface for file selection -->
+        <lightning-tabset active-tab-value="upload" variant="scoped">
+            <lightning-tab label="Upload New File" value="upload">
+                <div class="ai-upload-wrapper slds-p-around_medium">
+                    <lightning-file-upload
+                        label="Upload Image or PDF"
+                        name="uploadFile"
+                        multiple="false"
+                        accept=".jpg,.jpeg,.png,.pdf"
+                        record-id={recordId}
+                        onuploadfinished={fileUploadHandler}>
+                    </lightning-file-upload>
                 </div>
-            </template>
-        </div>
+            </lightning-tab>
+            <lightning-tab label="Select Existing File" value="existing">
+                <div class="slds-p-around_medium">
+                    <!-- Show combobox if files exist -->
+                    <template if:true={hasFiles}>
+                        <lightning-combobox
+                            name="existingFiles"
+                            label="Choose a file from this record"
+                            value={uploadedFileId}
+                            placeholder="Select a file..."
+                            options={fileOptions}
+                            onchange={handleFileSelectionChange}>
+                        </lightning-combobox>
+                    </template>
+                    <!-- Show message if no files exist -->
+                    <template if:false={hasFiles}>
+                        <div class="slds-text-align_center slds-p-vertical_medium slds-text-color_weak">
+                            No existing files found on this record.
+                        </div>
+                    </template>
+                </div>
+            </lightning-tab>
+        </lightning-tabset>
+
+        <!-- Display the name of the selected file -->
+        <template if:true={uploadedFileName}>
+            <div class="ai-uploaded-file slds-m-left_medium slds-m-right_medium">
+                <lightning-icon icon-name="doctype:image" size="x-small"></lightning-icon>
+                <span class="ai-uploaded-file-name">{uploadedFileName}</span>
+            </div>
+        </template>
 
         <!-- Analyze Button -->
         <lightning-button
             variant="brand"
-            label="Analyze Files"
+            label="Analyze Selected File"
             icon-name="utility:einstein"
             class="ai-analyze-btn slds-m-top_medium"
             disabled={disableAnalyzeButton}
-            onclick={handleAnalyzeFiles}
-        ></lightning-button>
+            onclick={handleAnalyzeFiles}>
+        </lightning-button>
 
         <!-- Loading Spinner -->
         <template if:true={isLoading}>
@@ -71,25 +97,16 @@
                 <lightning-button-group>
                     <lightning-button
                         variant="neutral"
-                        label="Add to Case"
-                        icon-name="utility:add"
-                        onclick={handleAddToCase}
-                    ></lightning-button>
-                    <lightning-button
-                        variant="neutral"
                         label="Copy"
                         icon-name="utility:copy"
-                        onclick={handleCopyToClipboard}
-                    ></lightning-button>
-                    <!-- Optional: Add Download as PDF if you plan to implement it -->
-                    <!--
+                        onclick={handleCopyToClipboard}>
+                    </lightning-button>
                     <lightning-button
                         variant="neutral"
-                        label="Download PDF"
-                        icon-name="utility:download"
-                        onclick={handleDownloadPdf}
-                    ></lightning-button>
-                    -->
+                        label="Start Flow"
+                        icon-name="utility:flow"
+                        onclick={handleStartFlow}>
+                    </lightning-button>
                 </lightning-button-group>
                 <template if:true={showActionToast}>
                     <div class="ai-action-toast">{actionToastMessage}</div>
@@ -97,4 +114,4 @@
             </div>
         </template>
     </div>
-</template>  
+</template>
