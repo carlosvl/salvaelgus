@@ -1,59 +1,87 @@
 <template>
     <div class="ai-glass-card">
+        <!-- Header updated with a new SVG icon -->
         <div class="ai-header">
             <div class="ai-avatar">
+                <!-- This new SVG is simpler and more reliable for deployment -->
                 <svg viewBox="0 0 64 64" class="ai-hero-icon">
-                  <circle cx="32" cy="32" r="30" fill="#ffe4ea"/>
-                  <g>
-                      <rect x="24" y="20" width="16" height="24" rx="6" fill="#e43c54"/>
-                      <ellipse cx="32" cy="32" rx="6" ry="6" fill="#fff"/>
-                  </g>
+                    <g>
+                        <!-- Tree Trunk -->
+                        <path d="M 30 58 L 30 42 C 30 40 32 40 32 42 L 32 58 Z" fill="#795548"/>
+                        <!-- Tree Leaves -->
+                        <circle cx="31" cy="28" r="14" fill="#4CAF50"/>
+                        <circle cx="22" cy="34" r="10" fill="#66BB6A"/>
+                        <circle cx="40" cy="34" r="10" fill="#81C784"/>
+                    </g>
                 </svg>
             </div>
             <div>
-                <div class="ai-title">File Analyzer <span class="ai-blink">✨</span></div>
-                <div class="ai-caption">Let AI review your Bills instantly</div>
+                <div class="ai-title">Bill Importer<span class="ai-blink">✨</span></div>
+                <div class="ai-caption">Let AI import your Bills instantly</div>
             </div>
         </div>
 
-        <!-- File Upload -->
-        <div class="ai-upload-wrapper">
-            <lightning-file-upload
-                label="Upload Image or PDF"
-                name="uploadFile"
-                multiple="false"
-                accept=".jpg,.jpeg,.png,.pdf"
-                record-id={uploadRecordId}
-                onuploadfinished={fileUploadHandler}
-                class="ai-file-upload"
-            ></lightning-file-upload>
-            <template if:true={uploadedFileName}>
-                <div class="ai-uploaded-file">
-                    <lightning-icon icon-name="doctype:image" size="x-small"></lightning-icon>
-                    <span class="ai-uploaded-file-name">{uploadedFileName}</span>
+        <!-- File upload and selection section -->
+   
+        <lightning-tabset active-tab-value="upload" variant="scoped">
+            <lightning-tab label="Upload New File" value="upload">
+                <div class="ai-upload-wrapper slds-p-around_medium">
+                    <lightning-file-upload
+                        label="Upload Image or PDF"
+                        name="uploadFile"
+                        multiple="false"
+                        accept=".jpg,.jpeg,.png,.pdf"
+                        record-id={recordId}
+                        onuploadfinished={fileUploadHandler}>
+                    </lightning-file-upload>
                 </div>
-            </template>
-        </div>
+            </lightning-tab>
+            <lightning-tab label="Select Existing File" value="existing">
+                <div class="slds-p-around_medium">
+                    <template if:true={hasFiles}>
+                        <lightning-combobox
+                            name="existingFiles"
+                            label="Choose a file from this record"
+                            value={uploadedFileId}
+                            placeholder="Select a file..."
+                            options={fileOptions}
+                            onchange={handleFileSelectionChange}>
+                        </lightning-combobox>
+                    </template>
+                    <template if:false={hasFiles}>
+                        <div class="slds-text-align_center slds-p-vertical_medium slds-text-color_weak">
+                            No existing files found on this record.
+                        </div>
+                    </template>
+                </div>
+            </lightning-tab>
+        </lightning-tabset>
 
-        <!-- Analyze Button -->
+        <!-- Selected file display remains the same -->
+        <template if:true={uploadedFileName}>
+            <div class="ai-uploaded-file slds-m-left_medium slds-m-right_medium">
+                <lightning-icon icon-name="doctype:image" size="x-small"></lightning-icon>
+                <span class="ai-uploaded-file-name">{uploadedFileName}</span>
+            </div>
+        </template>
+
+        <!-- Analyze button remains the same -->
         <lightning-button
             variant="brand"
-            label="Analyze Files"
+            label="Analyze Selected File"
             icon-name="utility:einstein"
             class="ai-analyze-btn slds-m-top_medium"
             disabled={disableAnalyzeButton}
-            onclick={handleAnalyzeFiles}
-        ></lightning-button>
+            onclick={handleAnalyzeFiles}>
+        </lightning-button>
 
-        <!-- Loading Spinner -->
+        <!-- Loading and Error sections remain the same -->
         <template if:true={isLoading}>
             <div class="ai-loading">
                 <div class="ai-loader"></div>
                 <span class="ai-analyzing">Analyzing with AI…</span>
             </div>
         </template>
-
-        <!-- Error Message -->
         <template if:true={errorMessage}>
             <div class="ai-error">
                 <lightning-icon icon-name="utility:error" size="x-small"></lightning-icon>
@@ -61,35 +89,36 @@
             </div>
         </template>
 
-        <!-- AI Analysis Result + Actions -->
+        <!-- NEW: Updated AI Analysis Result Section -->
         <template if:true={aiResult}>
             <div class="ai-result">
-                <lightning-icon icon-name="utility:bot" size="small"></lightning-icon>
-                <lightning-formatted-rich-text value={aiResult}></lightning-formatted-rich-text>
+                <!-- If the result is formatted (is JSON), display the table -->
+                <template if:true={formattedResult}>
+                    <table class="slds-table slds-table_cell-buffer slds-table_bordered ai-result-table">
+                        <tbody>
+                            <template for:each={formattedResult} for:item="item">
+                                <tr key={item.id}>
+                                    <th scope="row" class="ai-result-key">{item.label}</th>
+                                    <td class="ai-result-value">{item.value}</td>
+                                </tr>
+                            </template>
+                        </tbody>
+                    </table>
+                </template>
+                <!-- Otherwise, fall back to the original rich text display -->
+                <template if:false={formattedResult}>
+                    <div class="ai-result-raw">
+                        <lightning-icon icon-name="utility:bot" size="small"></lightning-icon>
+                        <lightning-formatted-rich-text value={aiResult}></lightning-formatted-rich-text>
+                    </div>
+                </template>
             </div>
+
+            <!-- Actions section remains the same -->
             <div class="ai-actions-group">
                 <lightning-button-group>
-                    <lightning-button
-                        variant="neutral"
-                        label="Add to Case"
-                        icon-name="utility:add"
-                        onclick={handleAddToCase}
-                    ></lightning-button>
-                    <lightning-button
-                        variant="neutral"
-                        label="Copy"
-                        icon-name="utility:copy"
-                        onclick={handleCopyToClipboard}
-                    ></lightning-button>
-                    <!-- Optional: Add Download as PDF if you plan to implement it -->
-                    <!--
-                    <lightning-button
-                        variant="neutral"
-                        label="Download PDF"
-                        icon-name="utility:download"
-                        onclick={handleDownloadPdf}
-                    ></lightning-button>
-                    -->
+                    <lightning-button variant="neutral" label="Copy" icon-name="utility:copy" onclick={handleCopyToClipboard}></lightning-button>
+                    <lightning-button variant="neutral" label="Create EUR" icon-name="utility:flow" onclick={handleStartFlow}></lightning-button>
                 </lightning-button-group>
                 <template if:true={showActionToast}>
                     <div class="ai-action-toast">{actionToastMessage}</div>
@@ -97,4 +126,4 @@
             </div>
         </template>
     </div>
-</template>  
+</template>
