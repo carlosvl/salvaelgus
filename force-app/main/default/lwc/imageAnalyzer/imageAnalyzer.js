@@ -2,7 +2,7 @@ import { LightningElement, api, track, wire } from 'lwc';
 import { NavigationMixin } from 'lightning/navigation';
 import analyzeFiles from '@salesforce/apex/AIFileAnalysisController.analyzeFiles';
 import getRelatedFiles from '@salesforce/apex/AIFileAnalysisController.getRelatedFiles';
-import getOrgBaseUrl from '@salesforce/apex/AIFileAnalysisController.getOrgBaseUrl'; // Import new Apex method
+import getOrgBaseUrl from '@salesforce/apex/AIFileAnalysisController.getOrgBaseUrl';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 
 export default class AIFileAnalysisController extends NavigationMixin(LightningElement) {
@@ -20,11 +20,40 @@ export default class AIFileAnalysisController extends NavigationMixin(LightningE
     @track actionToastMessage = '';
 
     @track fileOptions = [];
-    @track orgBaseUrl; // Property to hold the org's base URL
+    @track orgBaseUrl;
 
     _wiredFilesResult;
 
-    // Wire to get the org's base URL
+    /**
+     * NEW: A getter that attempts to parse the AI result as JSON.
+     * If successful, it formats the data into a key-value array for display.
+     * If not, it returns null, and the component will fall back to displaying raw text.
+     */
+    get formattedResult() {
+        try {
+            // Clean the string: The AI might wrap the JSON in ```json ... ```
+            const cleanedString = this.aiResult.replace(/```json\n?|\n?```/g, '').trim();
+            const parsed = JSON.parse(cleanedString);
+            
+            // Ensure it's an object before processing
+            if (typeof parsed === 'object' && parsed !== null && !Array.isArray(parsed)) {
+                return Object.keys(parsed).map(key => {
+                    // Create a more readable label from the JSON key
+                    const label = key.replace(/_/g, ' ').replace(/\b\w/g, char => char.toUpperCase());
+                    return {
+                        id: key,
+                        label: label,
+                        value: parsed[key]
+                    };
+                });
+            }
+            return null; // It's valid JSON, but not an object we can format (e.g., just a string or number)
+        } catch (e) {
+            // If parsing fails, it's not JSON. Return null.
+            return null;
+        }
+    }
+
     @wire(getOrgBaseUrl)
     wiredOrgUrl({ error, data }) {
         if (data) {
@@ -44,7 +73,6 @@ export default class AIFileAnalysisController extends NavigationMixin(LightningE
         } else if (result.error) {
             this.errorMessage = 'Could not load existing files.';
             this.fileOptions = [];
-            console.error('Error fetching files:', JSON.stringify(result.error, null, 2));
         }
     }
 
@@ -71,11 +99,6 @@ export default class AIFileAnalysisController extends NavigationMixin(LightningE
             this.uploadedFileId = uploadedFiles[0].documentId;
             this.uploadedFileName = uploadedFiles[0].name;
             this.disableAnalyzeButton = false;
-            this.showToastMessage(
-                'File Uploaded',
-                `${this.uploadedFileName} has been uploaded successfully`,
-                'success'
-            );
         }
     }
 
@@ -100,34 +123,18 @@ export default class AIFileAnalysisController extends NavigationMixin(LightningE
         try {
             const result = await analyzeFiles({ fileId: this.uploadedFileId });
             this.aiResult = result;
-            this.showToastMessage(
-                'AI Analysis Complete',
-                'The AI-powered analysis is now ready!',
-                'success'
-            );
+            this.showToastMessage('AI Analysis Complete', 'The AI-powered analysis is now ready!', 'success');
         } catch (err) {
-            this.errorMessage =
-                (err && err.body && err.body.message) ||
-                'Error analyzing file. Please try again.';
-            this.showToastMessage(
-                'Analysis Error',
-                this.errorMessage,
-                'error'
-            );
+            this.errorMessage = (err && err.body && err.body.message) || 'Error analyzing file. Please try again.';
+            this.showToastMessage('Analysis Error', this.errorMessage, 'error');
         } finally {
             this.isLoading = false;
         }
     }
 
-    handleAddToCase() {
-        this.showSimpleActionToast('Added to Case (demo only)');
-    }
-
     handleCopyToClipboard() {
-        const tempElement = document.createElement('div');
-        tempElement.innerHTML = this.aiResult;
-        const plainText = tempElement.innerText || tempElement.textContent || "";
-        navigator.clipboard.writeText(plainText);
+        // Copy the raw result, not the formatted version
+        navigator.clipboard.writeText(this.aiResult);
         this.showSimpleActionToast('Copied to clipboard!');
     }
 
@@ -136,22 +143,9 @@ export default class AIFileAnalysisController extends NavigationMixin(LightningE
             this.showToastMessage('Configuration Error', 'Flow API Name is not available.', 'error');
             return;
         }
-
-        const tempElement = document.createElement('div');
-        tempElement.innerHTML = this.aiResult;
-        const plainTextResult = tempElement.innerText || tempElement.textContent || "";
-
-        // URL-encode the parameters to ensure they are passed correctly
-        const encodedResult = encodeURIComponent(plainTextResult);
-
-        // Construct the relative URL with parameters. This is more reliable than using the absolute URL.
-        let flowUrl = `/flow/${this.flowApiName}`;
-        flowUrl += `?input_AIAnalysisResult=${encodedResult}`;
-        flowUrl += `&recordId=${this.recordId}`;
-        
-        console.log(`Opening new tab with relative URL: ${flowUrl}`);
-
-        // Use window.open, which we've confirmed works, with the full parameter string.
+        // Pass the raw result to the flow
+        const encodedResult = encodeURIComponent(this.aiResult);
+        let flowUrl = `/flow/${this.flowApiName}?input_AIAnalysisResult=${encodedResult}&recordId=${this.recordId}`;
         window.open(flowUrl, '_blank');
     }
 
@@ -162,12 +156,7 @@ export default class AIFileAnalysisController extends NavigationMixin(LightningE
     }
 
     showToastMessage(title, message, variant) {
-        this.dispatchEvent(
-            new ShowToastEvent({
-                title: title,
-                message: message,
-                variant: variant || 'info'
-            })
-        );
+        this.dispatchEvent(new ShowToastEvent({ title: title, message: message, variant: variant || 'info' }));
     }
 }
+// This component handles file uploads, AI analysis, and displays results.
