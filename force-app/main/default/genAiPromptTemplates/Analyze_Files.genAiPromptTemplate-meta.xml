@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<GenAiPromptTemplate xmlns="http://soap.sforce.com/2006/04/metadata">
+    <activeVersionIdentifier>SULypBMF4xLzydrM2hO3ybzca9W+lg5cjWqaZURnPbA=_6</activeVersionIdentifier>
+    <developerName>Analyze_Files</developerName>
+    <masterLabel>Analyze_Files</masterLabel>
+    <templateVersions>
+        <content>Extract key information in details from the attached File. Do not miss anything important. Return response in html format. Do not return any info outside the HTML block. Do not return triple quotes or any unwanted characters.
+</content>
+        <inputs>
+            <apiName>Analyze_Files</apiName>
+            <definition>SOBJECT://ContentDocument</definition>
+            <masterLabel>Analyze Files</masterLabel>
+            <referenceName>Input:Analyze_Files</referenceName>
+            <required>true</required>
+        </inputs>
+        <primaryModel>sfdc_ai__DefaultOpenAIGPT4OmniMini</primaryModel>
+        <status>Published</status>
+        <versionIdentifier>SULypBMF4xLzydrM2hO3ybzca9W+lg5cjWqaZURnPbA=_1</versionIdentifier>
+    </templateVersions>
+    <templateVersions>
+        <content>Extract key information in detail from the attached File. Do not miss anything important. 
+I need to find the address, billing date, kilowatts consumed, charge amount, and other information to identify the account and location of the consumption. You might also find information about natural gas consumption. If you find it, get the consumption and charge information for this as well.
+After that, I need you to do two things. First, create a JSON blob with the information referenced before.
+Then I need you to return the response in HTML format. Do not return any info outside the HTML block. Do not return triple quotes or any unwanted characters.
+</content>
+        <inputs>
+            <apiName>Analyze_Files</apiName>
+            <definition>SOBJECT://ContentDocument</definition>
+            <masterLabel>Analyze Files</masterLabel>
+            <referenceName>Input:Analyze_Files</referenceName>
+            <required>true</required>
+        </inputs>
+        <primaryModel>sfdc_ai__DefaultOpenAIGPT4OmniMini</primaryModel>
+        <status>Published</status>
+        <versionIdentifier>SULypBMF4xLzydrM2hO3ybzca9W+lg5cjWqaZURnPbA=_2</versionIdentifier>
+    </templateVersions>
+    <templateVersions>
+        <content>Extract key information in detail from the attached File. Do not miss anything important. 
+I need to find the address, billing date, kilowatts consumed, charge amount, and other information to identify the account and location of the consumption. You might also find information about natural gas consumption. If you find it, get the consumption and charge information for this as well.
+After that, I need you to first, create a JSON blob with the information referenced before.
+
+Then I also need you to return the same information but in HTML format.
+Do not return any info outside the HTML block. 
+</content>
+        <inputs>
+            <apiName>Analyze_Files</apiName>
+            <definition>SOBJECT://ContentDocument</definition>
+            <masterLabel>Analyze Files</masterLabel>
+            <referenceName>Input:Analyze_Files</referenceName>
+            <required>true</required>
+        </inputs>
+        <primaryModel>sfdc_ai__DefaultOpenAIGPT4OmniMini</primaryModel>
+        <status>Published</status>
+        <versionIdentifier>SULypBMF4xLzydrM2hO3ybzca9W+lg5cjWqaZURnPbA=_3</versionIdentifier>
+    </templateVersions>
+    <templateVersions>
+        <content>Extract key information in detail from the attached File. Do not miss anything important. 
+I need to find the address, billing date, kilowatts consumed, charge amount, and other information to identify the account and location of the consumption. You might also find information about natural gas consumption. If you find it, get the consumption and charge information for this as well.
+After that, I need you to do two things. First, create a JSON blob with the information referenced before.
+Then I need you to return the response in HTML format. 
+But make sure that you hide the JSON blob in the HTML block, even if you have to use transparent text, so it does not render on the screen. While you also create a version that is readable by a human.
+Do not return any info outside the HTML block. 
+Do not return any unwanted characters.
+</content>
+        <inputs>
+            <apiName>Analyze_Files</apiName>
+            <definition>SOBJECT://ContentDocument</definition>
+            <masterLabel>Analyze Files</masterLabel>
+            <referenceName>Input:Analyze_Files</referenceName>
+            <required>true</required>
+        </inputs>
+        <primaryModel>sfdc_ai__DefaultOpenAIGPT4OmniMini</primaryModel>
+        <status>Published</status>
+        <versionIdentifier>SULypBMF4xLzydrM2hO3ybzca9W+lg5cjWqaZURnPbA=_4</versionIdentifier>
+    </templateVersions>
+    <templateVersions>
+        <content>Extract key information in detail from the attached File. Do not miss anything important. 
+I need to find the address, billing date, kilowatts consumed, charge amount, and other information to identify the account and location of the consumption. You might also find information about natural gas consumption. If you find it, get the consumption and charge information for this as well.
+After that, create a JSON blob with the information referenced before.
+
+use this names for the JSON 
+
+account
+mailing_address
+account_number
+due_date
+statement_number
+statement_date
+amount_due
+kilowatts_consumed
+charge_amount_electricity
+natural_gas
+therms_consumed
+charge_amount_gas
+
+Do not return any unwanted characters.
+ONLY return the JSON, DO NOT include the triple quote marks
+</content>
+        <inputs>
+            <apiName>Analyze_Files</apiName>
+            <definition>SOBJECT://ContentDocument</definition>
+            <masterLabel>Analyze Files</masterLabel>
+            <referenceName>Input:Analyze_Files</referenceName>
+            <required>true</required>
+        </inputs>
+        <primaryModel>sfdc_ai__DefaultOpenAIGPT4OmniMini</primaryModel>
+        <status>Published</status>
+        <versionIdentifier>SULypBMF4xLzydrM2hO3ybzca9W+lg5cjWqaZURnPbA=_5</versionIdentifier>
+    </templateVersions>
+    <templateVersions>
+        <content>Extract key information in detail from the attached File. Do not miss anything important. 
+I need to find the address, billing date, kilowatts consumed, charge amount, and other information to identify the account and location of the consumption. You might also find information about natural gas consumption. If you find it, get the consumption and charge information for this as well.
+After that, create a JSON blob with the information referenced before.
+
+Use these names for the JSON, for all numbers, ONLY return the digits, and do not add the units 
+
+account
+mailing_address
+account_number
+due_date
+statement_number
+statement_date
+amount_due
+kilowatts_consumed
+charge_amount_electricity
+natural_gas
+therms_consumed
+charge_amount_gas
+
+Do not return any unwanted characters.
+ONLY return the JSON, DO NOT include the triple quote marks
+</content>
+        <inputs>
+            <apiName>Analyze_Files</apiName>
+            <definition>SOBJECT://ContentDocument</definition>
+            <masterLabel>Analyze Files</masterLabel>
+            <referenceName>Input:Analyze_Files</referenceName>
+            <required>true</required>
+        </inputs>
+        <primaryModel>sfdc_ai__DefaultOpenAIGPT4OmniMini</primaryModel>
+        <status>Published</status>
+        <versionIdentifier>SULypBMF4xLzydrM2hO3ybzca9W+lg5cjWqaZURnPbA=_6</versionIdentifier>
+    </templateVersions>
+    <type>einstein_gpt__flex</type>
+    <visibility>Global</visibility>
+</GenAiPromptTemplate>
